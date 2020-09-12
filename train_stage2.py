@@ -47,7 +47,7 @@ def train_stage2():
     if not (os.path.isdir('./Result_stage2/')):
         os.makedirs('Result_stage2')
     num_epoch = 600
-    iters = 0
+    
     for epoch in range(num_epoch+1):
         if epoch % 100 == 0 and epoch > 0:
             lr = lr*0.5
