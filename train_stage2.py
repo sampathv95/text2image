@@ -1,7 +1,7 @@
 import os
 import torch
 import torch.nn as nn
-from dataset import BirdDataset
+from utils.dataset import BirdDataset
 from models.main_stage_1 import G_Stage1
 from models.main_stage_2 import G_Stage2, D_Stage2
 import matplotlib.pyplot as plt
@@ -9,8 +9,8 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 import torch.optim as optim
-from helpers import KL_loss, weights_init, cal_D_loss, cal_G_loss
-print('in')
+from utils.helpers import KL_loss, weights_init, cal_D_loss, cal_G_loss
+
 def train_stage2():
     device = torch.device('cpu')
     # load dataset with size 256x256

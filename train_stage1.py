@@ -1,13 +1,13 @@
 import os
 import torch
-from dataset import BirdDataset
+from utils.dataset import BirdDataset
 from models.main_stage_1 import G_Stage1, D_Stage1
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 import torch.optim as optim
-from helpers import KL_loss, weights_init, cal_D_loss, cal_G_loss
+from utils.helpers import KL_loss, weights_init, cal_D_loss, cal_G_loss
 
 CUDA = True
 cond_dim = 128
