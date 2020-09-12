@@ -1,5 +1,6 @@
 import os
 import torch
+import timeit
 import torch.nn as nn
 from utils.dataset import BirdDataset
 from models.main_stage_1 import G_Stage1
@@ -55,7 +56,10 @@ def train_stage2():
                 param_group['lr'] = lr
             for param_group in optD.param_groups:
                 param_group['lr'] = lr
+        begin = timeit.default_timer()
         train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, optG, device)
+        end = timeit.default_timer()
+        print('time for epoch {} is {}'.format(epoch, end-begin))
 
 def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, optG, device):
 
@@ -63,6 +67,8 @@ def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, opt
     fake_labels = (torch.FloatTensor(batch_size).fill_(0)).to(device)
 
     for i, data in enumerate(tr_loader,0):
+        begin = timeit.default_timer()
+
         real_imgs, encoded_caps = data
         real_imgs = real_imgs.to(device)
         encoded_caps = encoded_caps.to(device)
@@ -83,10 +89,13 @@ def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, opt
         errG.backward()
         optG.step()
 
+        end = timeit.default_timer()
+
         if i%50 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tLoss_D_R: %.4f\tLoss_D_W: %.4f\tLoss_D_F %.4f'
                 % (epoch, 600, i, len(tr_loader),
                     errD.item(), errG.item(), errD_real, errD_wrong, errD_fake))
+            print('time for {} batch is {}'.format(i, end-begin))
 
         if epoch%10==0:
             with torch.no_grad():
@@ -95,8 +104,10 @@ def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, opt
                 grid = make_grid(fake.detach().cpu(), nrow=8, normalize=True).permute(1,2,0).numpy()
                 plt.imshow(grid)
                 fig.savefig('./Result_stage2/epch-{}.png'.format(epoch))
+                plt.close('all')
         if epoch%25==0:
             torch.save(netG.state_dict(), './Result_stage2/netG2_epoch_{}.pth'.format(epoch))
+        if epoch == 600:
             torch.save(netD.state_dict(), './Result_stage2/netD2_epoch_{}.pth'.format(epoch))
 
 if __name__ == '__main__':
