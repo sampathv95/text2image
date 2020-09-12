@@ -1,7 +1,7 @@
 import os
 import torch
 from dataset import BirdDataset
-from main_stage_1 import G_Stage1, D_Stage1
+from models.main_stage_1 import G_Stage1, D_Stage1
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from torch.utils.data import DataLoader

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from main_stage_1 import Conv_k3, Upblock,G_Stage1, CondAugment_Model
+from models.main_stage_1 import Conv_k3, Upblock,G_Stage1, CondAugment_Model
 import torch
 import torch.nn as nn
 

@@ -2,15 +2,15 @@ import os
 import torch
 import torch.nn as nn
 from dataset import BirdDataset
-from main_stage_1 import G_Stage1
-from main_stage_2 import G_Stage2, D_Stage2
+from models.main_stage_1 import G_Stage1
+from models.main_stage_2 import G_Stage2, D_Stage2
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 import torch.optim as optim
 from helpers import KL_loss, weights_init, cal_D_loss, cal_G_loss
-
+print('in')
 def train_stage2():
     device = torch.device('cpu')
     # load dataset with size 256x256
@@ -87,7 +87,7 @@ def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, opt
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tLoss_D_R: %.4f\tLoss_D_W: %.4f\tLoss_D_F %.4f'
                 % (epoch, 600, i, len(tr_loader),
                     errD.item(), errG.item(), errD_real, errD_wrong, errD_fake))
-                    
+
         if epoch%10==0:
             with torch.no_grad():
                 _, fake, _, _  = netG(fixed_noise, encoded_caps)
