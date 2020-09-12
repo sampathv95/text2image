@@ -43,9 +43,6 @@ def train_stage2():
     optG = optim.Adam(netG_param, lr=lr, betas=(0.5, 0.999))
 
     fixed_noise = torch.rand(batch_size, 100, 1, 1).to(device)
-
-    real_labels = (torch.FloatTensor(batch_size).fill_(1)).to(device)
-    fake_labels = (torch.FloatTensor(batch_size).fill_(0)).to(device)
     
     if not (os.path.isdir('./Result_stage2/')):
         os.makedirs('Result_stage2')
@@ -58,31 +55,40 @@ def train_stage2():
                 param_group['lr'] = lr
             for param_group in optD.param_groups:
                 param_group['lr'] = lr
-        for i, data in enumerate(tr_loader,0):
-            real_imgs, encoded_caps = data
-            real_imgs = real_imgs.to(device)
-            encoded_caps = encoded_caps.to(device)
+        train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, optG, device)
 
-            ##update discriminator
-            netD.zero_grad()
-            # generate fake image
-            noise = torch.rand(batch_size, 100, 1, 1).to(device)
-            init_img ,fake_imgs, m, s = netG(noise, encoded_caps)
-            errD, errD_real, errD_wrong, errD_fake = cal_D_loss(netD, real_imgs, fake_imgs, real_labels, fake_labels, m)
-            errD.backward()
-            optD.step()
+def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, optG, device):
 
-            ##update generator
-            netG.zero_grad()
-            errG = cal_G_loss(netD, fake_imgs, real_labels, m)
-            errG += errG + KL_loss(m,s)
-            errG.backward()
-            optG.step()
+    real_labels = (torch.FloatTensor(batch_size).fill_(1)).to(device)
+    fake_labels = (torch.FloatTensor(batch_size).fill_(0)).to(device)
 
-            if i%50 == 0:
-                 print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tLoss_D_R: %.4f\tLoss_D_W: %.4f\tLoss_D_F %.4f'
-                      % (epoch, num_epoch, i, len(tr_loader),
-                         errD.item(), errG.item(), errD_real, errD_wrong, errD_fake))
+    for i, data in enumerate(tr_loader,0):
+        real_imgs, encoded_caps = data
+        real_imgs = real_imgs.to(device)
+        encoded_caps = encoded_caps.to(device)
+
+        ##update discriminator
+        netD.zero_grad()
+        # generate fake image
+        noise = torch.rand(batch_size, 100, 1, 1).to(device)
+        init_img ,fake_imgs, m, s = netG(noise, encoded_caps)
+        errD, errD_real, errD_wrong, errD_fake = cal_D_loss(netD, real_imgs, fake_imgs, real_labels, fake_labels, m)
+        errD.backward()
+        optD.step()
+
+        ##update generator
+        netG.zero_grad()
+        errG = cal_G_loss(netD, fake_imgs, real_labels, m)
+        errG += errG + KL_loss(m,s)
+        errG.backward()
+        optG.step()
+
+        if i%50 == 0:
+                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tLoss_D_R: %.4f\tLoss_D_W: %.4f\tLoss_D_F %.4f'
+                    % (epoch, 600, i, len(tr_loader),
+                        errD.item(), errG.item(), errD_real, errD_wrong, errD_fake))
+        
+        return 
         if epoch%10==0:
             with torch.no_grad():
                 _, fake, _, _  = netG(fixed_noise, encoded_caps)
