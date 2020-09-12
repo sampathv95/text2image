@@ -84,9 +84,9 @@ def train_epoch(epoch, batch_size, tr_loader, netG, netD, fixed_noise, optD, opt
         optG.step()
 
         if i%50 == 0:
-                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tLoss_D_R: %.4f\tLoss_D_W: %.4f\tLoss_D_F %.4f'
-                    % (epoch, 600, i, len(tr_loader),
-                        errD.item(), errG.item(), errD_real, errD_wrong, errD_fake))
+            print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tLoss_D_R: %.4f\tLoss_D_W: %.4f\tLoss_D_F %.4f'
+                % (epoch, 600, i, len(tr_loader),
+                    errD.item(), errG.item(), errD_real, errD_wrong, errD_fake))
         
         return 
         if epoch%10==0:
