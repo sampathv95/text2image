@@ -36,9 +36,11 @@ world_size = 4
 dist_backend = 'nccl'
 
 # Url used to setup distributed training
-dist_url = "tcp://172.31.22.234:23456"
+dist_url = "tcp://localhost:12355/"
 
 print("Initialize Process Group...")
+#os.environ['MASTER_ADDR'] = 'localhost'
+#os.environ['MASTER_PORT'] = '12355'
 dist.init_process_group(backend=dist_backend, init_method=dist_url, rank=int(sys.argv[1]), world_size=world_size)
 
 local_rank = int(sys.argv[2])
@@ -52,8 +54,9 @@ transform = transforms.Compose([
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 dataset = BirdDataset(dataDir = './data/bird_stack/', split='train', transform=transform, imgSize=256)
 
+print('in')
 train_sampler = torch.utils.data.distributed.DistributedSampler(dataset)
-
+print('out')
 tr_loader = DataLoader(dataset, batch_size=batch_size, shuffle=(train_sampler is None),
                         num_workers=workers, pin_memory=False, sampler=train_sampler)
 
